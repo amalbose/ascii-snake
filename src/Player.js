@@ -38,6 +38,8 @@ export class Player {
     onEvent = (eventOptions) => {
         if(eventOptions.event == "ate") {
             this._eat();
+        } else if(eventOptions.event == "die") {
+            this._die();
         }
     }
 
@@ -59,6 +61,10 @@ export class Player {
     _eat = () => {
         this._grow = true;
         document.getElementById("beepSound").play();
+    }
+
+    _die = () => {
+        document.getElementById("dieSound").play();
     }
 
     _moveTail = (diff) => {

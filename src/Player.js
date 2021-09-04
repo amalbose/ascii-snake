@@ -1,6 +1,6 @@
 import { DIRS } from "rot-js/lib/index";
 
-const PLAYER_COLOR = "pink";
+const PLAYER_COLOR = "red";
 const HEAD_CHAR = "0";
 const BODY_CHAR = "o";
 
@@ -9,6 +9,7 @@ export class Player {
     _y = 0;
     _dir = DIRS[8][0];
     _tail = [];
+    _alive = true;
     _grow = false;
     _noGoList
 
@@ -29,10 +30,12 @@ export class Player {
     }
 
     draw = () => {
-        this._game.drawCell(this._x, this._y, HEAD_CHAR, PLAYER_COLOR);
-        this._tail.forEach(i => {
-            this._game.drawCell(i.x, i.y, BODY_CHAR, PLAYER_COLOR);
-        })
+        if(this._alive) {
+            this._game.drawCell(this._x, this._y, HEAD_CHAR, PLAYER_COLOR);
+            this._tail.forEach(i => {
+                this._game.drawCell(i.x, i.y, BODY_CHAR, PLAYER_COLOR);
+            })
+        }
     }
 
     onEvent = (eventOptions) => {
@@ -64,7 +67,9 @@ export class Player {
     }
 
     _die = () => {
-        document.getElementById("dieSound").play();
+        this._alive = false;
+        this._game.clearAll();
+        // document.getElementById("dieSound").play();
     }
 
     _moveTail = (diff) => {
@@ -108,6 +113,13 @@ export class Player {
     
         var code = e.keyCode;
     
+        if(code == 38 && DIRS[8][4] == this._dir ||
+            code == 40 && DIRS[8][0] == this._dir ||
+            code == 39 && DIRS[8][6] == this._dir ||
+            code == 37 && DIRS[8][2] == this._dir) {
+            return
+        }
+
         if (!(code in keyMap)) { return; }
     
         var diff = DIRS[8][keyMap[code]];

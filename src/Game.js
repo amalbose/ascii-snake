@@ -22,7 +22,8 @@ export class Game {
         this._display = new Display({
             width: WIDTH,
             height: HEIGHT,
-            fontSize: 22
+            fontSize: 22,
+            // bg: "pink"
         });
         document.body.appendChild(this._display.getContainer());
     }
@@ -52,6 +53,10 @@ export class Game {
         this._display.draw(x, y, this.map[key], bg);
     }
 
+    clearAll = () => {
+        this._drawWholeMap();
+    }
+
     drawCell = (x, y, char, color) => {
         this._display.draw(x, y, char, color);
     }
@@ -70,17 +75,13 @@ export class Game {
             itms = this._wallPositions.filter(i => i == key);
             if(itms.length > 0) {
                 // hit wall
-                this._snake.onEvent({
-                    event : "die"
-                })
+                this._hitObstruction();
             } else {
                 itms = this._snake._tail.filter(i => {
                     let ikey = this._getKey(i.x, i.y);
                     if(ikey == key) {
                        // hit self
-                        this._snake.onEvent({
-                            event : "die"
-                        }) 
+                        this._hitObstruction();
                     }
                 });
 
@@ -146,5 +147,12 @@ export class Game {
 
     _getKey = (x, y) => {
         return x+","+y;
+    }
+
+    _hitObstruction = () => {
+        this._snake.onEvent({
+            event : "die"
+        }) 
+        this._display.draw(WIDTH/2, HEIGHT/2, "You are DEAD!!!", "red");
     }
 }

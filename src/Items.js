@@ -33,6 +33,26 @@ const items = [
         "name" : "Orange",
         "char" : "0",
         "color" : "orange"
+    },
+    {
+        "name" : "Pear",
+        "char" : "%",
+        "color" : "green"
+    },
+    {
+        "name" : "Banana",
+        "char" : "(",
+        "color" : "yellow"
+    },
+    {
+        "name" : "Pineapple",
+        "char" : "&",
+        "color" : "yellow"
+    },
+    {
+        "name" : "Lemon",
+        "char" : "/",
+        "color" : "yellow"
     }
 ]
 

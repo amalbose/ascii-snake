@@ -16,12 +16,14 @@ export class Game {
     _engine = null;
     _snake = null;
     _itemsPositions = [];
+    _wallPositions = [];
 
     constructor() {
         this._display = new Display({
             width: WIDTH,
             height: HEIGHT,
-            fontSize: 22
+            fontSize: 22,
+            // bg: "pink"
         });
         document.body.appendChild(this._display.getContainer());
     }
@@ -42,7 +44,17 @@ export class Game {
     }
 
     clearCell = (x, y) => {
-        this._display.draw(x, y, this.map[x+","+y], CELL_BG);
+        let key = x+","+y;
+        var isCell = this.map[key] === CELL_CHAR;
+        let bg = CELL_BG;
+        if(!isCell) {
+            bg = WALL_BG;
+        }
+        this._display.draw(x, y, this.map[key], bg);
+    }
+
+    clearAll = () => {
+        this._drawWholeMap();
     }
 
     drawCell = (x, y, char, color) => {
@@ -50,14 +62,30 @@ export class Game {
     }
 
     onPlayerPositionChange = (x, y) => {
-        let itms = this._itemsPositions.filter(i => i.x == x && i.y == y);
+        let key = this._getKey(x, y);
+        let itms = this._itemsPositions.filter(i => i == key);
         if(itms.length > 0) {
-            let itm = itms[0];
+           // hit item
            this._snake.onEvent({
                event : "ate"
            })
-           this._itemsPositions.splice(this._itemsPositions.findIndex(i => i.x == x && i.y == y),1);
+           this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
            this._createNewItem();
+        } else {
+            itms = this._wallPositions.filter(i => i == key);
+            if(itms.length > 0) {
+                // hit wall
+                this._hitObstruction();
+            } else {
+                itms = this._snake._tail.filter(i => {
+                    let ikey = this._getKey(i.x, i.y);
+                    if(ikey == key) {
+                       // hit self
+                        this._hitObstruction();
+                    }
+                });
+
+            }
         }
     }
 
@@ -77,11 +105,12 @@ export class Game {
     }
 
     _createNewItem = () => {
-        let x = Math.floor(RNG.getUniform() * WIDTH - 2) + 1;
-        let y = Math.floor(RNG.getUniform() * HEIGHT - 2) + 1;
+        let x = Math.floor(RNG.getUniformInt(1, WIDTH - 1));
+        let y = Math.floor(RNG.getUniformInt(1, HEIGHT - 1));
         console.log(x, y)
         let item = createRandomItem(this, x, y);
-        this._itemsPositions.push({x, y});
+        let key = this._getKey(x,y);
+        this._itemsPositions.push(key);
     }
 
     _generateMap = () => {
@@ -89,9 +118,10 @@ export class Game {
         var freeCells = [];
         var mapCallback = function(x, y, value) {
             let dataVal = CELL_CHAR;
-            let key = x+","+y;
-            if(x==0 || y == 0 || x== 79 || y == 24) {
+            let key = this._getKey(x, y);
+            if(x==0 || y == 0 || x== (WIDTH - 1) || y == (HEIGHT - 1) || (y == 12 && x > 12 && x < 33)) {
                 dataVal = "#";
+                this._wallPositions.push(key);
             } else {
                 freeCells.push(key);
             }
@@ -113,5 +143,16 @@ export class Game {
             }
             this._display.draw(x, y, this.map[key], bg);
         }
+    }
+
+    _getKey = (x, y) => {
+        return x+","+y;
+    }
+
+    _hitObstruction = () => {
+        this._snake.onEvent({
+            event : "die"
+        }) 
+        this._display.draw(WIDTH/2, HEIGHT/2, "You are DEAD!!!", "red");
     }
 }

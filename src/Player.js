@@ -1,4 +1,4 @@
-import { DIRS } from "rot-js/lib/index";
+import { KEYS, DIRS } from "rot-js/lib/index";
 
 const PLAYER_COLOR = "pink";
 const HEAD_CHAR = "0";
@@ -32,6 +32,16 @@ export class Player {
         this._initTail();
         this.draw();
         this._startTicker();
+    }
+
+    resetPlayer(life, x, y) {
+        this._alive = true;
+        this._x = x;
+        this._y = y;
+        this.life =life;
+        this._dir = DIRS[8][0];
+        this._initTail();
+        this.draw();
     }
 
     _initTail = () => {
@@ -137,7 +147,7 @@ export class Player {
         keyMap[36] = 7;
     
         var code = e.keyCode;
-    
+
         if(code == 38 && DIRS[8][4] == this._dir ||
             code == 40 && DIRS[8][0] == this._dir ||
             code == 39 && DIRS[8][6] == this._dir ||

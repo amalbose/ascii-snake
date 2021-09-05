@@ -1,5 +1,5 @@
 
-import { RNG, Engine, Display, Scheduler } from "rot-js/lib/index";
+import { RNG, KEYS, Engine, Display, Scheduler } from "rot-js/lib/index";
 import { Player } from "./Player";
 import createRandomItem from "./Items"
 import { Board } from "./Board";
@@ -10,10 +10,14 @@ const HEIGHT = 25;
 const HUB_HEIGHT = 4;
 const LIFE_COUNT = 2;
 const NO_DEATH = false;
+
+const GAME_STATE_RUNNING = 1;
+const GAME_STATE_PAUSED = 2;
+const GAME_STATE_ENDED = 3;
 export class Game {
 
     map = {};
-
+    state = GAME_STATE_RUNNING;
     _display = null;
     _hdisplay = null;
     _engine = null;
@@ -46,6 +50,11 @@ export class Game {
         this._initPlayer();
         this._initScheduler();
         this._initItems();
+        this._initListeners();
+    }
+
+    _initListeners = () => {
+        window.addEventListener("keydown", this);
     }
 
     lockEngine = () => {
@@ -77,13 +86,18 @@ export class Game {
     }
 
     onPlayerDead = () => {
+        this._items.forEach(i => i.die());
+        this.wallPositions = [];
         this.clearAll();
         this._updateHub();
-        this._display.draw(WIDTH/2, HEIGHT/2, "You are DEAD!!!", "red");
+        this.state = GAME_STATE_ENDED;
+        this._drawPanel(7, 30);
     }
 
     drawCell = (x, y, char, color) => {
-        this._display.draw(x, y, char, color);
+        if(this.state == GAME_STATE_RUNNING) {
+            this._display.draw(x, y, char, color);
+        }
     }
 
     drawHubCell = (x, y, char, color) => {
@@ -151,16 +165,30 @@ export class Game {
     }
 
     onItemExpiry = (x, y) => {
-        let key = this.getKey(x, y);
-        let removed = this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
-        this._board.clearSurrounding(x, y);
-        if(removed) {
-            this._createNewItem();
+        if(this.state == GAME_STATE_RUNNING) {
+            let key = this.getKey(x, y);
+            let removed = this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
+            this._board.clearSurrounding(x, y);
+            if(removed) {
+                this._createNewItem();
+            }
         }
     }
     
     getKey = (x, y) => {
         return x+","+y;
+    }
+
+    
+    handleEvent = (e) => {
+        if(this.state == GAME_STATE_ENDED) {
+
+            if(e.keyCode == KEYS.VK_R) {
+                console.log("Restarting");
+                this.state = GAME_STATE_RUNNING;
+                this.init();
+            }
+        }
     }
 
     _initBoard = () => {
@@ -179,7 +207,11 @@ export class Game {
     }
 
     _initPlayer = () => {
-        this._snake = new Player(this, LIFE_COUNT, 10, 10);
+        if(this._snake) {
+            this._snake.resetPlayer(LIFE_COUNT, 10, 10);
+        } else {
+            this._snake = new Player(this, LIFE_COUNT, 10, 10);
+        }
     }
 
     _initItems = () => {
@@ -213,5 +245,26 @@ export class Game {
         this._snake.onEvent({
             event : "lifeLost"
         }) 
+    }
+
+    _drawPanel = (row, col) => {
+        let midw = WIDTH/2 - col/2;
+        let midh = HEIGHT/2 - row/2;
+        let fg = "#999999";
+        let bg = "#343434";
+        for(let i = 0; i < row; i++) {
+            for(let j =0; j < col; j++) {
+                if(i == 0) {
+                    this._display.draw(midw+j, midh+i, " ", fg, "#505050");
+                } else {
+                    this._display.draw(midw+j, midh+i, " ", "#999999", bg);
+                }
+            }
+        }
+        this._display.draw(WIDTH/2, HEIGHT/2-1, "You are dead!", "red", bg);
+        // this._display.draw(WIDTH/2, HEIGHT/2, "---------------", "red");
+
+        this._display.draw(WIDTH/2, HEIGHT/2+2, "[R]etry        [C]lose", "#dedede", bg );
+
     }
 }

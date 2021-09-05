@@ -8,23 +8,24 @@ export class Board {
     _game = null;
     _width = 80;
     _height = 25;
+    level = 1;
     map = {};
 
     constructor(game, width, height) {
         this._width = width;
         this._height = height;
         this._game = game;
-        this._generateMap();
+        this._generateMap(this.level);
     }
 
-    _generateMap = () => {
+    _generateMap = (level) => {
         var map = new Map.Cellular(this._width,this._height, { connected: true});
         var freeCells = [];
-        map.randomize(0.21);
+        map.randomize(0.18 + 0.01 * level);
         var mapCallback = function(x, y, value) {
             let dataVal = CELL_CHAR;
             let key = this._game.getKey(x, y);
-            if(value || x==0 || y == 0 || x== (this._width - 1) || y == (this._height - 1) || (y == 12 && x > 12 && x < 33)) {
+            if(value || x == 0 || y == 0 || x== (this._width - 1) || y == (this._height - 1)) {
                 dataVal = "#";
                 this._game.wallPositions.push(key);
             } else {

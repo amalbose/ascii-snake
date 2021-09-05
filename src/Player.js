@@ -5,6 +5,8 @@ const HEAD_CHAR = "0";
 const BODY_CHAR = "o";
 
 export class Player {
+    _initX = 0;
+    _initY = 0;
     _x = 0;
     _y = 0;
     _dir = DIRS[8][0];
@@ -15,17 +17,26 @@ export class Player {
     _bodyChar = BODY_CHAR;
     _color = PLAYER_COLOR;
     points = 0;
+    life = 1;
     _noGoList
 
     _game = null;
 
-    constructor(game, x, y) {
+    constructor(game, life, x, y) {
+        this._initX = x;
+        this._initY = y;
         this._x = x;
         this._y = y;
         this._game = game;
-        this._tail.push({x: x, y: y + 1}, {x: x, y: y + 2}, {x: x+1, y: y + 2})
+        this.life =life;
+        this._initTail();
         this.draw();
         this._startTicker();
+    }
+
+    _initTail = () => {
+        this._tail = [];
+        this._tail.push({x: this._initX, y: this._initY + 1})
     }
 
     _startTicker = () => {
@@ -47,8 +58,16 @@ export class Player {
             this._eat();
             let gainedPoints = eventOptions.points;
             this.points += gainedPoints;
-        } else if(eventOptions.event == "die") {
-            this._die();
+        } else if(eventOptions.event == "lifeLost") {
+            this.life--;
+            if(this.life == 0) {
+                this._die();
+                return;
+            }
+            this._x = this._initX;
+            this._y = this._initY;
+            this._initTail();
+            this._game.onNewPlayerLife();
         }
     }
 
@@ -74,7 +93,7 @@ export class Player {
 
     _die = () => {
         this._alive = false;
-        this._game.clearAll();
+        this._game.onPlayerDead();
         // document.getElementById("dieSound").play();
     }
 

@@ -8,7 +8,8 @@ import { Hub } from "./Hub";
 const WIDTH = 80;
 const HEIGHT = 25;
 const HUB_HEIGHT = 4;
-const NO_DEATH = true;
+const LIFE_COUNT = 2;
+const NO_DEATH = false;
 export class Game {
 
     map = {};
@@ -67,12 +68,30 @@ export class Game {
         this._board.draw();
     }
 
+    onNewPlayerLife = () => {
+        this._items.forEach(i => i.die());
+        this.clearAll();
+        this._snake.draw();
+        this._initItems();
+        this._updateHub();
+    }
+
+    onPlayerDead = () => {
+        this.clearAll();
+        this._updateHub();
+        this._display.draw(WIDTH/2, HEIGHT/2, "You are DEAD!!!", "red");
+    }
+
     drawCell = (x, y, char, color) => {
         this._display.draw(x, y, char, color);
     }
 
     drawHubCell = (x, y, char, color) => {
         this._hdisplay.draw(x, y, char, color);
+    }
+
+    clearHubText = (x, y) => {
+        this._hdisplay.draw(x, y, " ");
     }
 
     drawHubText = (x, y, char) => {
@@ -148,6 +167,7 @@ export class Game {
         this._board = new Board(this, WIDTH, HEIGHT);
         this._board.draw();
         this._hub = new Hub(this, WIDTH, HUB_HEIGHT);
+        this._hub.setAvailableLife(2);
         this._hub.draw();
     }
 
@@ -159,16 +179,19 @@ export class Game {
     }
 
     _initPlayer = () => {
-        this._snake = new Player(this, 10, 10);
+        this._snake = new Player(this, LIFE_COUNT, 10, 10);
     }
 
     _initItems = () => {
+        this._items = [];
+        this._itemsPositions = [];
         this._createNewItem();
     }
 
     _updateHub = () => {
         let points = this._snake.points;
-        this._hub.update(points);
+        let life = this._snake.life;
+        this._hub.update(points, life);
     }
 
     _createNewItem = () => {
@@ -188,8 +211,7 @@ export class Game {
 
     _hitObstruction = () => {
         this._snake.onEvent({
-            event : "die"
+            event : "lifeLost"
         }) 
-        this._display.draw(WIDTH/2, HEIGHT/2, "You are DEAD!!!", "red");
     }
 }

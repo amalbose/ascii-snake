@@ -10,6 +10,7 @@ export class Hub {
     _height = 25;
     points = 0;
     life = 1;
+    _availableLife = 1;
     map = {};
     _textBegin = 65;
     _valBegin = this._textBegin + 8;
@@ -34,6 +35,11 @@ export class Hub {
         map.create(mapCallback.bind(this));
     }
 
+    setAvailableLife = (life) => {
+        this.life = life;
+        this._availableLife = life;
+    }
+
     draw = () => {
         for (var key in this.map) {
             var parts = key.split(",");
@@ -49,9 +55,10 @@ export class Hub {
         this._drawText();
     }
 
-    update(points) {
+    update(points, life) {
         this.points = points;
-        this._drawPoints();
+        this.life = life;
+        this.draw()
     }
 
     _drawText = () => {
@@ -70,6 +77,14 @@ export class Hub {
 
     _drawLife = () => {
         this._game.drawHubText(this._textBegin, 3, "Life: ");
-        this._game.drawHubCell(this._valBegin, 3, "❤".repeat(this.life), "red");
+        let cel = this._valBegin;
+        for(let i = 0; i < this.life; i++) {
+            this._game.drawHubCell(cel, 3, "❤ ", "red");
+            cel = cel + 2;
+        }
+        for(let i = 0; i < this._availableLife - this.life; i++) {
+            this._game.drawHubCell(cel, 3, "❤ ", "gray");
+            cel = cel + 2;
+        }
     }
 }

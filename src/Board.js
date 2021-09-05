@@ -18,12 +18,13 @@ export class Board {
     }
 
     _generateMap = () => {
-        var map = new Map.Cellular(this._width,this._height);
+        var map = new Map.Cellular(this._width,this._height, { connected: true});
         var freeCells = [];
+        map.randomize(0.21);
         var mapCallback = function(x, y, value) {
             let dataVal = CELL_CHAR;
             let key = this._game.getKey(x, y);
-            if(x==0 || y == 0 || x== (this._width - 1) || y == (this._height - 1) || (y == 12 && x > 12 && x < 33)) {
+            if(value || x==0 || y == 0 || x== (this._width - 1) || y == (this._height - 1) || (y == 12 && x > 12 && x < 33)) {
                 dataVal = "#";
                 this._game.wallPositions.push(key);
             } else {

@@ -3,17 +3,21 @@ import { RNG, Engine, Display, Scheduler } from "rot-js/lib/index";
 import { Player } from "./Player";
 import createRandomItem from "./Items"
 import { Board } from "./Board";
+import { Hub } from "./Hub";
 
 const WIDTH = 80;
 const HEIGHT = 25;
-const NO_DEATH = false;
+const HUB_HEIGHT = 4;
+const NO_DEATH = true;
 export class Game {
 
     map = {};
 
     _display = null;
+    _hdisplay = null;
     _engine = null;
     _board = null;
+    _hub = null;
     _snake = null;
     _items = [];
     _itemsPositions = [];
@@ -26,11 +30,18 @@ export class Game {
             fontSize: 25,
             // bg: "pink"
         });
+        this._hdisplay = new Display({
+            width: WIDTH,
+            height: HUB_HEIGHT,
+            fontSize: 25,
+            // bg: "pink"
+        });
+        document.body.appendChild(this._hdisplay.getContainer());
         document.body.appendChild(this._display.getContainer());
     }
 
     init = () => {
-        this._initMap();
+        this._initBoard();
         this._initPlayer();
         this._initScheduler();
         this._initItems();
@@ -60,6 +71,14 @@ export class Game {
         this._display.draw(x, y, char, color);
     }
 
+    drawHubCell = (x, y, char, color) => {
+        this._hdisplay.draw(x, y, char, color);
+    }
+
+    drawHubText = (x, y, char) => {
+        this._hdisplay.drawText(x, y, char);
+    }
+
     drawPlayer = (x, y, char, color) => {
         this._display.draw(x, y, char, color);
         let key = this.getKey(x, y);
@@ -82,15 +101,17 @@ export class Game {
         console.log(this._itemsPositions);
         if(itms.length > 0) {
             let itm = this._items.filter(i => i._x == x && i._y == y)[0];
-            itm._dead = true;
-            clearTimeout(itm._timeout);
+            let gainedPoints = itm.getValue();
+            itm.die();
             this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
             this._items.splice(this._items.findIndex(i => i._x == x && i._y == y), 1);
             this._board.clearSurrounding(x, y);
            // hit item
            this._snake.onEvent({
-               event : "ate"
+               event : "ate",
+               points: gainedPoints
            })
+           this._updateHub();
            console.log("ate");
            this._createNewItem();
         } else if(!NO_DEATH) {
@@ -123,9 +144,11 @@ export class Game {
         return x+","+y;
     }
 
-    _initMap = () => {
+    _initBoard = () => {
         this._board = new Board(this, WIDTH, HEIGHT);
         this._board.draw();
+        this._hub = new Hub(this, WIDTH, HUB_HEIGHT);
+        this._hub.draw();
     }
 
     _initScheduler = () => {
@@ -141,6 +164,11 @@ export class Game {
 
     _initItems = () => {
         this._createNewItem();
+    }
+
+    _updateHub = () => {
+        let points = this._snake.points;
+        this._hub.update(points);
     }
 
     _createNewItem = () => {

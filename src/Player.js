@@ -14,6 +14,7 @@ export class Player {
     _headChar = HEAD_CHAR;
     _bodyChar = BODY_CHAR;
     _color = PLAYER_COLOR;
+    points = 0;
     _noGoList
 
     _game = null;
@@ -44,6 +45,8 @@ export class Player {
     onEvent = (eventOptions) => {
         if(eventOptions.event == "ate") {
             this._eat();
+            let gainedPoints = eventOptions.points;
+            this.points += gainedPoints;
         } else if(eventOptions.event == "die") {
             this._die();
         }

@@ -3,6 +3,7 @@ import { Map } from "rot-js/lib/index";
 const CELL_BG = "#232323";
 const WALL_BG = "#767676";
 const CELL_CHAR = "";
+
 export class Hub {
 
     _game = null;

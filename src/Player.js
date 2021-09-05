@@ -71,6 +71,7 @@ export class Player {
         if(eventOptions.event == "ate") {
             this._eat();
             let gainedPoints = eventOptions.points;
+            this._game.setStatus("You gained " + gainedPoints + " points by eating " + eventOptions.name)
             this.points += gainedPoints;
         } else if(eventOptions.event == "lifeLost") {
             this.life--;

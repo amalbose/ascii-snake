@@ -4,10 +4,12 @@ import { Player } from "./Player";
 import {createRandomFruitItem} from "./Items"
 import { Board } from "./Board";
 import { Hub } from "./Hub";
+import { StatusBar } from "./StatusBar";
 
 const WIDTH = 80;
 const HEIGHT = 25;
 const HUB_HEIGHT = 4;
+const STATUS_HEIGHT = 2;
 const LIFE_COUNT = 2;
 const NO_DEATH = false;
 
@@ -21,9 +23,11 @@ export class Game {
     state = GAME_STATE_RUNNING;
     _display = null;
     _hdisplay = null;
+    _sdisplay = null;
     _engine = null;
     _board = null;
     _hub = null;
+    _statusBar = null;
     _snake = null;
     _items = [];
     _itemsPositions = [];
@@ -39,11 +43,16 @@ export class Game {
         this._hdisplay = new Display({
             width: WIDTH,
             height: HUB_HEIGHT,
-            fontSize: 25,
-            // bg: "pink"
+            fontSize: 25
+        });
+        this._sdisplay = new Display({
+            width: WIDTH,
+            height: STATUS_HEIGHT,
+            fontSize: 25
         });
         document.body.appendChild(this._hdisplay.getContainer());
         document.body.appendChild(this._display.getContainer());
+        document.body.appendChild(this._sdisplay.getContainer());
     }
     
     isRunning = () => {
@@ -56,11 +65,13 @@ export class Game {
         this._initScheduler();
         this._initItems();
         this._initListeners();
+        this.setStatus("Game started...")
     }
 
     reDraw = () => {
         this._board.draw();
         this._hub.draw();
+        this._statusBar.draw();
         this._snake.draw();
         this._items.forEach(i => i.draw());
     }
@@ -116,6 +127,14 @@ export class Game {
         this._hdisplay.draw(x, y, char, color);
     }
 
+    drawStatusCell = (x, y, char, color) => {
+        this._sdisplay.draw(x, y, char, color);
+    }
+
+    drawStatusText = (x, y, char) => {
+        this._sdisplay.drawText(x, y, char);
+    }
+
     clearHubText = (x, y) => {
         this._hdisplay.draw(x, y, " ");
     }
@@ -156,7 +175,8 @@ export class Game {
            // hit item
            this._snake.onEvent({
                event : "ate",
-               points: gainedPoints
+               points: gainedPoints,
+               name: itm._name
            })
            this._updateHub();
            this.reDraw();
@@ -166,12 +186,14 @@ export class Game {
             itms = this.wallPositions.filter(i => i == key);
             if(itms.length > 0) {
                 // hit wall
+                this.setStatus("You hit a wall")
                 this._hitObstruction();
             } else {
                 itms = this._snake._tail.filter(i => {
                     let ikey = this.getKey(i.x, i.y);
                     if(ikey == key) {
                        // hit self
+                       this.setStatus("You hit yourself")
                         this._hitObstruction();
                     }
                 });
@@ -206,12 +228,18 @@ export class Game {
         }
     }
 
+    setStatus = (text) => {
+        this._statusBar.setText(text);
+    }
+
     _initBoard = () => {
         this._board = new Board(this, WIDTH, HEIGHT);
         this._board.draw();
         this._hub = new Hub(this, WIDTH, HUB_HEIGHT);
         this._hub.setAvailableLife(2);
         this._hub.draw();
+        this._statusBar = new StatusBar(this, WIDTH, STATUS_HEIGHT);
+        this._statusBar.draw();
     }
 
     _initScheduler = () => {

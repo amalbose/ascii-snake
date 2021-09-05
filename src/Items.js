@@ -5,6 +5,7 @@ class Item {
     _x = 0;
     _y = 0;
     _char = "";
+    _name = "";
     _color = "#000";
     _expiry = -1;
     _value = 0;
@@ -14,9 +15,10 @@ class Item {
 
     _game = null;
 
-    constructor(game, x, y, char, color, expiry, value) {
+    constructor(game, x, y, name, char, color, expiry, value) {
         this._x = x;
         this._y = y;
+        this._name = name;
         console.log("Creating ", this._x, this._y)
         this._char = char;
         this._color = color;
@@ -93,7 +95,7 @@ function createRandomFruitItem(game, x, y) {
     if(!itemProp.value) {
         itemProp.value = 10;
     }
-    return new Item(game, x, y, itemProp.char, itemProp.color, itemProp.expiry, itemProp.value);
+    return new Item(game, x, y, itemProp.name, itemProp.char, itemProp.color, itemProp.expiry, itemProp.value);
 }
 
 export { createRandomFruitItem }

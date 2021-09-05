@@ -34,9 +34,9 @@ export class Player {
 
     draw = () => {
         if(this._alive) {
-            this._game.drawCell(this._x, this._y, HEAD_CHAR, PLAYER_COLOR);
+            this._game.drawPlayer(this._x, this._y, HEAD_CHAR, PLAYER_COLOR);
             this._tail.forEach(i => {
-                this._game.drawCell(i.x, i.y, BODY_CHAR, PLAYER_COLOR);
+                this._game.drawPlayer(i.x, i.y, BODY_CHAR, PLAYER_COLOR);
             })
         }
     }

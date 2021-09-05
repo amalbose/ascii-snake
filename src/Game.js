@@ -1,7 +1,7 @@
 
 import { RNG, KEYS, Engine, Display, Scheduler } from "rot-js/lib/index";
 import { Player } from "./Player";
-import createRandomItem from "./Items"
+import {createRandomFruitItem} from "./Items"
 import { Board } from "./Board";
 import { Hub } from "./Hub";
 
@@ -14,6 +14,7 @@ const NO_DEATH = false;
 const GAME_STATE_RUNNING = 1;
 const GAME_STATE_PAUSED = 2;
 const GAME_STATE_ENDED = 3;
+
 export class Game {
 
     map = {};
@@ -146,7 +147,7 @@ export class Game {
            })
            this._updateHub();
            console.log("ate");
-           this._createNewItem();
+           this._createNewFruitItem();
         } else if(!NO_DEATH) {
             itms = this.wallPositions.filter(i => i == key);
             if(itms.length > 0) {
@@ -170,7 +171,7 @@ export class Game {
             let removed = this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
             this._board.clearSurrounding(x, y);
             if(removed) {
-                this._createNewItem();
+                this._createNewFruitItem();
             }
         }
     }
@@ -178,7 +179,6 @@ export class Game {
     getKey = (x, y) => {
         return x+","+y;
     }
-
     
     handleEvent = (e) => {
         if(this.state == GAME_STATE_ENDED) {
@@ -217,7 +217,7 @@ export class Game {
     _initItems = () => {
         this._items = [];
         this._itemsPositions = [];
-        this._createNewItem();
+        this._createNewFruitItem();
     }
 
     _updateHub = () => {
@@ -226,7 +226,7 @@ export class Game {
         this._hub.update(points, life);
     }
 
-    _createNewItem = () => {
+    _createNewFruitItem = () => {
         console.log("creating new item")
         let x = Math.floor(RNG.getUniformInt(1, WIDTH - 1));
         let y = Math.floor(RNG.getUniformInt(1, HEIGHT - 1));
@@ -235,7 +235,7 @@ export class Game {
         y = Math.min(y, HEIGHT - 2);
         y = Math.max(1, y);
         console.log(x, y)
-        let item = createRandomItem(this, x, y);
+        let item = createRandomFruitItem(this, x, y);
         this._items.push(item);
         let key = this.getKey(x,y);
         this._itemsPositions.push(key);

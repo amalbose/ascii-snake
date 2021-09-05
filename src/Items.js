@@ -53,7 +53,7 @@ class Item {
     }
 }
 
-const items = [
+const fruits = [
     {
         "name" : "Apple",
         "char" : "🍎",
@@ -85,9 +85,8 @@ const items = [
         "color" : "yellow"
     }
 ]
-
-export default function createRandomItem(game, x, y) {
-    let itemProp = RNG.getItem(items);
+function createRandomFruitItem(game, x, y) {
+    let itemProp = RNG.getItem(fruits);
     if(!itemProp.expiry) {
         itemProp.expiry = 10;
     }
@@ -96,3 +95,5 @@ export default function createRandomItem(game, x, y) {
     }
     return new Item(game, x, y, itemProp.char, itemProp.color, itemProp.expiry, itemProp.value);
 }
+
+export { createRandomFruitItem }

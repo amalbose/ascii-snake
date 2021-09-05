@@ -70,6 +70,7 @@ export class Player {
             this.points += gainedPoints;
         } else if(eventOptions.event == "lifeLost") {
             this.life--;
+            document.getElementById("blingSound").play();
             if(this.life == 0) {
                 this._die();
                 return;
@@ -138,14 +139,14 @@ export class Player {
     handleEvent = (e) => {
         var keyMap = {};
         keyMap[38] = 0; // up
-        keyMap[33] = 1;
+        keyMap[104] = 0;    // num 9
         keyMap[39] = 2; // right
-        keyMap[34] = 3;
+        keyMap[102] = 2;    // num 6
         keyMap[40] = 4; // down 
-        keyMap[35] = 5;
+        keyMap[101] = 4;    // num 5
         keyMap[37] = 6; // left
-        keyMap[36] = 7;
-    
+        keyMap[100] = 6;    // num 4
+        console.log(e.keyCode);
         var code = e.keyCode;
 
         if(code == 38 && DIRS[8][4] == this._dir ||

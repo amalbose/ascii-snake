@@ -21,7 +21,7 @@ export class Game {
         this._display = new Display({
             width: WIDTH,
             height: HEIGHT,
-            fontSize: 22,
+            fontSize: 25,
             // bg: "pink"
         });
         document.body.appendChild(this._display.getContainer());
@@ -62,6 +62,7 @@ export class Game {
         let key = this.getKey(x, y);
         let itms = this._itemsPositions.filter(i => i == key);
         if(itms.length > 0) {
+            this._board.clearSurrounding(x, y);
            // hit item
            this._snake.onEvent({
                event : "ate"
@@ -69,20 +70,20 @@ export class Game {
            this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
            this._createNewItem();
         } else {
-            itms = this.wallPositions.filter(i => i == key);
-            if(itms.length > 0) {
-                // hit wall
-                this._hitObstruction();
-            } else {
-                itms = this._snake._tail.filter(i => {
-                    let ikey = this.getKey(i.x, i.y);
-                    if(ikey == key) {
-                       // hit self
-                        this._hitObstruction();
-                    }
-                });
+            // itms = this.wallPositions.filter(i => i == key);
+            // if(itms.length > 0) {
+            //     // hit wall
+            //     this._hitObstruction();
+            // } else {
+            //     itms = this._snake._tail.filter(i => {
+            //         let ikey = this.getKey(i.x, i.y);
+            //         if(ikey == key) {
+            //            // hit self
+            //             this._hitObstruction();
+            //         }
+            //     });
 
-            }
+            // }
         }
     }
     
@@ -113,6 +114,10 @@ export class Game {
     _createNewItem = () => {
         let x = Math.floor(RNG.getUniformInt(1, WIDTH - 1));
         let y = Math.floor(RNG.getUniformInt(1, HEIGHT - 1));
+        x = Math.min(x, WIDTH - 2);
+        x = Math.max(1, x);
+        y = Math.min(y, HEIGHT - 2);
+        y = Math.max(1, y);
         console.log(x, y)
         let item = createRandomItem(this, x, y);
         let key = this.getKey(x,y);

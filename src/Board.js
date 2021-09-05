@@ -49,6 +49,18 @@ export class Board {
         }
     }
 
+    clearSurrounding = (x, y) => {
+        this.clearCell(x, y - 1)
+        this.clearCell(x, y + 1)
+        this.clearCell(x + 1, y)
+        this.clearCell(x - 1, y)
+        this.clearCell(x - 1, y - 1)
+        this.clearCell(x - 1, y + 1)
+        this.clearCell(x + 1, y - 1)
+        this.clearCell(x + 1, y + 1)
+        this.clearCell(x, y)
+    }
+
     clearCell = (x, y) => {
         let key = this._game.getKey(x, y);
         var isCell = this.map[key] === CELL_CHAR;
@@ -56,6 +68,17 @@ export class Board {
         if(!isCell) {
             bg = WALL_BG;
         }
-        this._game.drawCell(x, y, this.map[key], bg);
+        let val = this.map[key];
+        let nextX = this._game._snake._x + this._game._snake._dir.x;
+        let nextY = this._game._snake._y + this._game._snake._dir.y;
+        if((x == this._game._snake._x && y == this._game._snake._y) || (x == nextX && y == nextY)) {
+            return
+        } else {
+            let itms = this._game._snake._tail.filter(i => i.x == x && i.y == y);
+            if(itms.length > 0) {
+                return
+            }
+        }
+        this._game.drawCell(x, y, val, bg);
     }
 }

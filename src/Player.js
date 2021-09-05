@@ -1,6 +1,6 @@
 import { DIRS } from "rot-js/lib/index";
 
-const PLAYER_COLOR = "red";
+const PLAYER_COLOR = "pink";
 const HEAD_CHAR = "0";
 const BODY_CHAR = "o";
 
@@ -11,6 +11,9 @@ export class Player {
     _tail = [];
     _alive = true;
     _grow = false;
+    _headChar = HEAD_CHAR;
+    _bodyChar = BODY_CHAR;
+    _color = PLAYER_COLOR;
     _noGoList
 
     _game = null;

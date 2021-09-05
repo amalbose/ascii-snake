@@ -26,32 +26,32 @@ class Item {
 const items = [
     {
         "name" : "Apple",
-        "char" : "@",
+        "char" : "🍎",
         "color" : "red"
     },
     {
         "name" : "Orange",
-        "char" : "0",
+        "char" : "🍊",
         "color" : "orange"
     },
     {
         "name" : "Pear",
-        "char" : "%",
+        "char" : "🍐",
         "color" : "green"
     },
     {
         "name" : "Banana",
-        "char" : "(",
+        "char" : "🍌",
         "color" : "yellow"
     },
     {
         "name" : "Pineapple",
-        "char" : "&",
+        "char" : "🍍",
         "color" : "yellow"
     },
     {
         "name" : "Lemon",
-        "char" : "/",
+        "char" : "🍋",
         "color" : "yellow"
     }
 ]

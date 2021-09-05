@@ -1,11 +1,9 @@
 
-import { RNG, Engine, Display, Map, Scheduler } from "rot-js/lib/index";
+import { RNG, Engine, Display, Scheduler } from "rot-js/lib/index";
 import { Player } from "./Player";
 import createRandomItem from "./Items"
+import { Board } from "./Board";
 
-const CELL_BG = "#232323";
-const WALL_BG = "#767676";
-const CELL_CHAR = "0";
 const WIDTH = 80;
 const HEIGHT = 25;
 export class Game {
@@ -14,9 +12,10 @@ export class Game {
 
     _display = null;
     _engine = null;
+    _board = null;
     _snake = null;
     _itemsPositions = [];
-    _wallPositions = [];
+    wallPositions = [];
 
     constructor() {
         this._display = new Display({
@@ -29,7 +28,7 @@ export class Game {
     }
 
     init = () => {
-        this._generateMap();
+        this._initMap();
         this._initPlayer();
         this._initScheduler();
         this._initItems();
@@ -43,18 +42,16 @@ export class Game {
         this._engine.unlock();
     }
 
+    setMap = (map) => {
+        this.map = map;
+    }
+
     clearCell = (x, y) => {
-        let key = x+","+y;
-        var isCell = this.map[key] === CELL_CHAR;
-        let bg = CELL_BG;
-        if(!isCell) {
-            bg = WALL_BG;
-        }
-        this._display.draw(x, y, this.map[key], bg);
+        this._board.clearCell(x, y);
     }
 
     clearAll = () => {
-        this._drawWholeMap();
+        this._board.draw();
     }
 
     drawCell = (x, y, char, color) => {
@@ -62,7 +59,7 @@ export class Game {
     }
 
     onPlayerPositionChange = (x, y) => {
-        let key = this._getKey(x, y);
+        let key = this.getKey(x, y);
         let itms = this._itemsPositions.filter(i => i == key);
         if(itms.length > 0) {
            // hit item
@@ -72,13 +69,13 @@ export class Game {
            this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
            this._createNewItem();
         } else {
-            itms = this._wallPositions.filter(i => i == key);
+            itms = this.wallPositions.filter(i => i == key);
             if(itms.length > 0) {
                 // hit wall
                 this._hitObstruction();
             } else {
                 itms = this._snake._tail.filter(i => {
-                    let ikey = this._getKey(i.x, i.y);
+                    let ikey = this.getKey(i.x, i.y);
                     if(ikey == key) {
                        // hit self
                         this._hitObstruction();
@@ -87,6 +84,15 @@ export class Game {
 
             }
         }
+    }
+    
+    getKey = (x, y) => {
+        return x+","+y;
+    }
+
+    _initMap = () => {
+        this._board = new Board(this, WIDTH, HEIGHT);
+        this._board.draw();
     }
 
     _initScheduler = () => {
@@ -109,44 +115,8 @@ export class Game {
         let y = Math.floor(RNG.getUniformInt(1, HEIGHT - 1));
         console.log(x, y)
         let item = createRandomItem(this, x, y);
-        let key = this._getKey(x,y);
+        let key = this.getKey(x,y);
         this._itemsPositions.push(key);
-    }
-
-    _generateMap = () => {
-        var map = new Map.Cellular(WIDTH,HEIGHT);
-        var freeCells = [];
-        var mapCallback = function(x, y, value) {
-            let dataVal = CELL_CHAR;
-            let key = this._getKey(x, y);
-            if(x==0 || y == 0 || x== (WIDTH - 1) || y == (HEIGHT - 1) || (y == 12 && x > 12 && x < 33)) {
-                dataVal = "#";
-                this._wallPositions.push(key);
-            } else {
-                freeCells.push(key);
-            }
-            this.map[key] = dataVal;
-        }
-        map.create(mapCallback.bind(this));
-        this._drawWholeMap()
-    }
-
-    _drawWholeMap = () => {
-        for (var key in this.map) {
-            var parts = key.split(",");
-            var x = parseInt(parts[0]);
-            var y = parseInt(parts[1]);
-            var isCell = this.map[key] === CELL_CHAR;
-            let bg = CELL_BG;
-            if(!isCell) {
-                bg = WALL_BG;
-            }
-            this._display.draw(x, y, this.map[key], bg);
-        }
-    }
-
-    _getKey = (x, y) => {
-        return x+","+y;
     }
 
     _hitObstruction = () => {

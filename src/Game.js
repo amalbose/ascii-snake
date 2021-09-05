@@ -6,6 +6,7 @@ import { Board } from "./Board";
 
 const WIDTH = 80;
 const HEIGHT = 25;
+const NO_DEATH = false;
 export class Game {
 
     map = {};
@@ -92,21 +93,20 @@ export class Game {
            })
            console.log("ate");
            this._createNewItem();
-        } else {
-            // itms = this.wallPositions.filter(i => i == key);
-            // if(itms.length > 0) {
-            //     // hit wall
-            //     this._hitObstruction();
-            // } else {
-            //     itms = this._snake._tail.filter(i => {
-            //         let ikey = this.getKey(i.x, i.y);
-            //         if(ikey == key) {
-            //            // hit self
-            //             this._hitObstruction();
-            //         }
-            //     });
-
-            // }
+        } else if(!NO_DEATH) {
+            itms = this.wallPositions.filter(i => i == key);
+            if(itms.length > 0) {
+                // hit wall
+                this._hitObstruction();
+            } else {
+                itms = this._snake._tail.filter(i => {
+                    let ikey = this.getKey(i.x, i.y);
+                    if(ikey == key) {
+                       // hit self
+                        this._hitObstruction();
+                    }
+                });
+            }
         }
     }
 

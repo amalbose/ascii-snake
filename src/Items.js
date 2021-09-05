@@ -56,32 +56,32 @@ class Item {
 const fruits = [
     {
         "name" : "Apple",
-        "char" : "🍎",
+        "char" : "🍎 ",
         "color" : "red"
     },
     {
         "name" : "Orange",
-        "char" : "🍊",
+        "char" : "🍊 ",
         "color" : "orange"
     },
     {
         "name" : "Pear",
-        "char" : "🍐",
+        "char" : "🍐 ",
         "color" : "green"
     },
-    {
-        "name" : "Banana",
-        "char" : "🍌",
-        "color" : "yellow"
-    },
+    // {
+    //     "name" : "Banana",
+    //     "char" : " 🍌",
+    //     "color" : "yellow"
+    // },
     {
         "name" : "Pineapple",
-        "char" : "🍍",
+        "char" : "🍍 ",
         "color" : "yellow"
     },
     {
         "name" : "Lemon",
-        "char" : "🍋",
+        "char" : "🍋 ",
         "color" : "yellow"
     }
 ]

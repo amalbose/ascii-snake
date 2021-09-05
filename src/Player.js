@@ -51,7 +51,11 @@ export class Player {
 
     _startTicker = () => {
         var that = this;
-        setInterval(function(){that.move(that._dir);}, 500);
+        setInterval(function(){
+            if(that._game.isRunning()) {
+                that.move(that._dir);
+            }
+        }, 500);
     }
 
     draw = () => {

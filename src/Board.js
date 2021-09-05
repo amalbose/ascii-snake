@@ -50,14 +50,6 @@ export class Board {
     }
 
     clearSurrounding = (x, y) => {
-        this.clearCell(x, y - 1)
-        this.clearCell(x, y + 1)
-        this.clearCell(x + 1, y)
-        this.clearCell(x - 1, y)
-        this.clearCell(x - 1, y - 1)
-        this.clearCell(x - 1, y + 1)
-        this.clearCell(x + 1, y - 1)
-        this.clearCell(x + 1, y + 1)
         this.clearCell(x, y)
     }
 

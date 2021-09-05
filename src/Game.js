@@ -45,6 +45,10 @@ export class Game {
         document.body.appendChild(this._hdisplay.getContainer());
         document.body.appendChild(this._display.getContainer());
     }
+    
+    isRunning = () => {
+        return this.state == GAME_STATE_RUNNING;
+    }
 
     init = () => {
         this._initBoard();
@@ -52,6 +56,13 @@ export class Game {
         this._initScheduler();
         this._initItems();
         this._initListeners();
+    }
+
+    reDraw = () => {
+        this._board.draw();
+        this._hub.draw();
+        this._snake.draw();
+        this._items.forEach(i => i.draw());
     }
 
     _initListeners = () => {
@@ -131,21 +142,24 @@ export class Game {
 
     onPlayerPositionChange = (x, y) => {
         let key = this.getKey(x, y);
-        let itms = this._itemsPositions.filter(i => i == key);
+        console.log(key)
+        let possibleKey = this.getKey(x+1, y);  // left of fruit
+        let itms = this._itemsPositions.filter(i => i == key || i == possibleKey);
         console.log(this._itemsPositions);
         if(itms.length > 0) {
-            let itm = this._items.filter(i => i._x == x && i._y == y)[0];
+            let itm = this._items.filter(i => (i._x == x && i._y == y) || (i._x == x + 1 && i._y == y))[0];
             let gainedPoints = itm.getValue();
             itm.die();
-            this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
-            this._items.splice(this._items.findIndex(i => i._x == x && i._y == y), 1);
-            this._board.clearSurrounding(x, y);
+            this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key || i == possibleKey),1);
+            this._items.splice(this._items.findIndex(i => (i._x == x && i._y == y) || (i._x == x + 1 && i._y == y)), 1);
+            // this._board.clearSurrounding(x, y);
            // hit item
            this._snake.onEvent({
                event : "ate",
                points: gainedPoints
            })
            this._updateHub();
+           this.reDraw();
            console.log("ate");
            this._createNewFruitItem();
         } else if(!NO_DEATH) {
@@ -166,10 +180,11 @@ export class Game {
     }
 
     onItemExpiry = (x, y) => {
+        let key = this.getKey(x, y);
+        let removed = this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
+        this._items.splice(this._items.findIndex(i => i._x == x && i._y == y), 1);
         if(this.state == GAME_STATE_RUNNING) {
-            let key = this.getKey(x, y);
-            let removed = this._itemsPositions.splice(this._itemsPositions.findIndex(i => i == key),1);
-            this._board.clearSurrounding(x, y);
+            this.reDraw();
             if(removed) {
                 this._createNewFruitItem();
             }
@@ -245,6 +260,7 @@ export class Game {
         this._snake.onEvent({
             event : "lifeLost"
         }) 
+        this.reDraw();
     }
 
     _drawPanel = (row, col) => {
